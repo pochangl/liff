@@ -10,15 +10,15 @@ interface IProfile {
 }
 
 interface IBluetooth {
-  getAvailability(): Promise<Boolean>
+  getAvailability(): Promise<boolean>
   equestDevice(options?: RequestDeviceOptions): Promise<BluetoothDevice>
 }
 
 interface ILiff {
   init(
     config: { liffId: string },
-    successCallback?: Function,
-    errorCallback?: Function,
+    successCallback?: () => void,
+    errorCallback?: () => void,
   )
   getOS (): string
   getLanguage (): string
@@ -26,7 +26,7 @@ interface ILiff {
   isInClient(): boolean
 
   // plugins
-  initPlugins(pluginList: Array<String>): Promise<void>
+  initPlugins(pluginList: string[]): Promise<void>
 
   // authentication
   isLoggedIn(): boolean
@@ -51,4 +51,23 @@ interface ILiff {
   closeWindow()
 }
 
-declare let liff: ILiff
+const promise = new Promise<ILiff>((resolve, reject) => {
+  const script = document.createElement('script')
+  script.onload = async () => {
+    const liff = (window as any).liff
+
+    resolve(liff)
+  }
+  script.src = 'https://static.line-scdn.net/liff/edge/2.1/sdk.js'
+
+  document.head.appendChild(script)
+})
+
+export async function getLiff(liffId): Promise<ILiff> {
+  const liff = await promise
+  liff.init({ liffId })
+  if (!liff.isInClient()) {
+    throw new Error('Not line app')
+  }
+  return liff
+}
