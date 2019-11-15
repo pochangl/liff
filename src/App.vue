@@ -16,23 +16,31 @@
         v-container
           p liff: {{ liff }}
           p profile: {{ profile }}
+          v-btn(v-if="!loggedIn" @click="login") line login
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { getLiff } from '@/plugins/liff'
+import { getLiff, ILiff } from '@/plugins/liff'
 
 @Component
 export default class App extends Vue {
-  liff: any = {}
+  liff: ILiff = {} as any
   profile: any = {}
+  loggedIn = false
 
   created () {
     this.initial()
   }
+  async login() {
+    this.liff.login()
+  }
 
   async initial () {
-    const liff = this.liff = await getLiff('1653390945')
-    this.profile = await liff.getProfile()
+    this.liff = await getLiff('1653390945-ADMNBQMb')
+    this.loggedIn = this.liff.isLoggedIn()
+    if (this.loggedIn) {
+      this.profile = await this.liff.getProfile()
+    }
   }
 }
 </script>

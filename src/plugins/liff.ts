@@ -14,7 +14,7 @@ interface IBluetooth {
   equestDevice(options?: RequestDeviceOptions): Promise<BluetoothDevice>
 }
 
-interface ILiff {
+export interface ILiff {
   init(
     config: { liffId: string },
     successCallback?: () => void,
@@ -66,8 +66,5 @@ const promise = new Promise<ILiff>((resolve, reject) => {
 export async function getLiff(liffId): Promise<ILiff> {
   const liff = await promise
   liff.init({ liffId })
-  if (!liff.isInClient()) {
-    throw new Error('Not line app')
-  }
   return liff
 }
